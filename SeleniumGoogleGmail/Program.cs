@@ -6,55 +6,53 @@ namespace GoogleGmail
 {
     public class Program
     {
-        private static bool term;
 
         static void Main(string[] args)
         {
+            var firstMail = "TSelenium001";
+            var password = "SELenium";
+            var seccondMail = "TSelenium007";
+            var termNewLetter = "Hi";
+            var textNewLetter = "How are you";
+            var textAnswer = "By";
 
             WebDriver driverGoogle = new ChromeDriver();
-            driverGoogle.Navigate().GoToUrl("https://www.google.com/intl/ru/gmail/about/");
-            HomePage homePage = new HomePage(driverGoogle);
-            homePage.OpenLoginPage();
-            LoginPage loginPage = new LoginPage(driverGoogle);
-            loginPage.InputEmailInLogin("TSelenium001");
-            loginPage.InputPasswordInLogin("SELenium");
 
-            MailPage mailPage = new MailPage(driverGoogle);
-            mailPage.NewWriteLetter();
-            mailPage.NewWriteLetterWhom("TSelenium007@gmail.com");
-            mailPage.TheTermLetter("hello");
-            mailPage.NewLetterText("How are you?");
-            mailPage.SendLetter();
+            HomePage home = new HomePage(driverGoogle);
 
-            Thread.Sleep(3000);
-            mailPage.Exit();
+            //1
+            LoginPage loginPage001 = home.OpenLoginPage();
+            loginPage001.InputEmailInLogin(firstMail);
+            loginPage001.InputPasswordInLogin(password);
+            AccountMail mail001 = new AccountMail(driverGoogle);
+            mail001.SwithToFrame();
+            var r = mail001.GetUserName();
+            Letter newLetter = mail001.OpenNewLetter();
+            newLetter.CreateNewLetterAndSend(seccondMail, termNewLetter, textNewLetter);
+            mail001.Exit();
 
-            HomePage homePage1 = new HomePage(driverGoogle);
-            homePage1.OpenLoginPage();
-            loginPage.InputEmailInLogin("TSelenium007");
-            loginPage.InputPasswordInLogin("SELenium");
-            mailPage.ReloadPage();
-            mailPage.OpenFirstLetter();
-            Console.WriteLine(term);
-            var textLetter = mailPage.OpenTextLetter();
-            Console.WriteLine(textLetter);
-            mailPage.AnswerLetter();
-            mailPage.PrintAnswerText("bye");
-            mailPage.SendAnswerLetter();
+            //2
+            Thread.Sleep(500);
+            LoginPage loginPage002 = home.OpenLoginPage();
+            loginPage002.InputEmailInLogin(seccondMail);
+            loginPage002.InputPasswordInLogin(password);
 
-            Thread.Sleep(3000);
-            mailPage.Exit();
+            AccountMail mail002 = new AccountMail(driverGoogle);
+            mail002.WaitLetterWithTermAndText(termNewLetter, textNewLetter);
+            mail002.OpenFirstLetter();
+            Letter answerLetter = mail002.OpenAnswerLetter();
+            answerLetter.CreateAnswerLetter(textAnswer);
+            mail002.Exit();
 
+            //3
+            Thread.Sleep(500);
+            loginPage001.InputEmailInLogin(firstMail);
+            loginPage001.InputPasswordInLogin(password);
+            mail001.WaitLetterWithTerm(termNewLetter);
+            mail001.OpenFirstLetter();
+            var textAnswerFor1 = answerLetter.GetTextLetter();
+            Console.WriteLine(textAnswerFor1);
 
-            loginPage.InputEmailInLogin("TSelenium001");
-            loginPage.InputPasswordInLogin("SELenium");
-            mailPage.ReloadPage();
-            mailPage.OpenFirstLetter();
-            var term2 = mailPage.OpenTermLetter();
-            mailPage.OpenTextLetter();
-
-            Thread.Sleep(3000);
-            mailPage.Exit();
             driverGoogle.Close();
         }
     }

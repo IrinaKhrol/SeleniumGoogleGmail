@@ -1,38 +1,30 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeleniumGoogleGmail
 {
-    public class HomePage
+    public class HomePage : BasePage
     {
-        protected IWebDriver _driverGoogle;
-
-        const string SITE_EMAIL_XPATH = "//a[@data-action='sign in']";
-
-        protected WebDriverWait _wait;
-
-
-        public HomePage(IWebDriver driverGoogle)
+        public HomePage(IWebDriver _driverGoogle) : base(_driverGoogle)
         {
-            _driverGoogle = driverGoogle;
-            _driverGoogle.Manage().Window.Maximize();
-            _wait = new WebDriverWait(_driverGoogle, TimeSpan.FromSeconds(3000));
+            GoToUrl("https://www.google.com/intl/ru/gmail/about/");
         }
-
-        public void GoToUrl(string url)
+        public string GetNamePost()
         {
-            _driverGoogle.Navigate().GoToUrl(url);
+            return FindElementWithWaiter(XPathGmail.SITE_NAME_POST_XPATH).Text;
         }
-
-        public void OpenLoginPage()
+        public IWebElement CheckSignInButton()
         {
-            _wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath(SITE_EMAIL_XPATH)));
-            _driverGoogle.FindElement(By.XPath(SITE_EMAIL_XPATH)).Click();
+            return FindElementWithWaiter(XPathGmail.SITE_EMAIL_LOGIN_XPATH);
+        }
+        public LoginPage OpenLoginPage()
+        {
+            FindElementWithWaiter(XPathGmail.SITE_EMAIL_LOGIN_XPATH).Click();
+            return new LoginPage(_driverGoogle);
+        }
+        public AccountMail OpenAccountMailPage()
+        {
+            return new AccountMail(_driverGoogle);
         }
     }
 }
